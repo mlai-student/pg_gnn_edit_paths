@@ -5,7 +5,7 @@ import os
 
 if __name__ == '__main__':
     # set the parameters for the generation of the edit paths
-    edit_path_generation_parameters = {'optimization_iterations': 100, 'timeout': 0.1, 'max_workers': None}
+    edit_path_generation_parameters = {'optimization_iterations': 100, 'timeout': 1, 'max_workers': None}
 
 
     # create data folder if it does not exist
