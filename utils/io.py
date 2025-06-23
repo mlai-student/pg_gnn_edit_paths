@@ -1,3 +1,5 @@
+import os
+
 from utils.EditPath import EditPath
 
 
@@ -15,14 +17,18 @@ def save_edit_path_to_file(db_name, edit_paths, file_path):
 def load_edit_paths_from_file(db_name, file_path):
     # load the global edit paths from a file
     edit_paths = dict()
-    with open(f'{file_path}/{db_name}_ged_paths.paths', 'r') as f:
-        for line in f:
-            parts = line.strip().split(' ', 2)
-            if len(parts) < 3:
-                continue
-            i, j, json_str = int(parts[0]), int(parts[1]), parts[2]
-            edit_path = EditPath().loadJSON(eval(json_str))
-            if (i, j) not in edit_paths:
-                edit_paths[(i, j)] = []
-            edit_paths[(i, j)].append(edit_path)
-    return edit_paths
+    # check if the file exists
+    if os.path.exists(f'{file_path}/{db_name}_ged_paths.paths'):
+        with open(f'{file_path}/{db_name}_ged_paths.paths', 'r') as f:
+            for line in f:
+                parts = line.strip().split(' ', 2)
+                if len(parts) < 3:
+                    continue
+                i, j, json_str = int(parts[0]), int(parts[1]), parts[2]
+                edit_path = EditPath().loadJSON(eval(json_str))
+                if (i, j) not in edit_paths:
+                    edit_paths[(i, j)] = []
+                edit_paths[(i, j)].append(edit_path)
+        return edit_paths
+    else:
+        return None

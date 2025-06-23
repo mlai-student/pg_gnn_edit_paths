@@ -3,13 +3,12 @@ from math import inf
 import networkx as nx
 from utils.plotting import plot_graph
 from utils.EditPath import EditPath
-from utils.io import save_edit_path_to_file
+from utils.io import save_edit_path_to_file, load_edit_paths_from_file
 
 
 def generate_pairwise_edit_paths(graph_dataset, db_name,
                                  output_dir:str = 'data/',
                                  optimization_iterations:int = 1,
-                                 max_num_edit_paths:int = 5,
                                  timeout:int = 1000000):
     """
     Generates pairwise optimal paths for the given database.
@@ -38,8 +37,15 @@ def generate_pairwise_edit_paths(graph_dataset, db_name,
     plot_graph(nx_graphs[1], with_node_ids=True)
     # iterate over all the graph pairs
     global_edit_paths = dict()
+    loaded_edit_paths = load_edit_paths_from_file(db_name=db_name, file_path='data')
     for i in range(len(nx_graphs)):
         for j in range(i + 1, len(nx_graphs)):
+            # check whether the loaded edit paths already contain the pair (i, j)
+            if loaded_edit_paths is not None:
+                if (i, j) in loaded_edit_paths:
+                    print(f"Edit path for graphs {i} and {j} already exist. Skipping generation.")
+                    global_edit_paths[(i, j)] = loaded_edit_paths[(i, j)]
+                    continue
             # set current distance to infinity
             current_edit_distance = float('inf')
             print(f"Comparing graph {i} with graph {j}")
@@ -50,10 +56,8 @@ def generate_pairwise_edit_paths(graph_dataset, db_name,
                 try:
                     x = next(result_nx)
                     edit_distance_x = x[2]
-                    if current_edit_distance == float('inf') or (edit_distance_x == current_edit_distance and len(optimal_edit_paths) < max_num_edit_paths):
-                        optimal_edit_paths.append(EditPath(db_name, i, j, start_graph=nx_graphs[i], end_graph=nx_graphs[j], edit_path=x))
-                    elif edit_distance_x < current_edit_distance:
-                        optimal_edit_paths = EditPath(db_name, i, j, start_graph=nx_graphs[i], end_graph=nx_graphs[j], edit_path=x)
+                    if edit_distance_x < current_edit_distance:
+                        optimal_edit_paths = [EditPath(db_name, i, j, start_graph=nx_graphs[i], end_graph=nx_graphs[j], edit_path=x)]
                         current_edit_distance = edit_distance_x
                     print(f"Generated edit path {p+1} / {optimization_iterations} for graphs {i} and {j}")
                     p += 1
@@ -61,5 +65,5 @@ def generate_pairwise_edit_paths(graph_dataset, db_name,
                     print(f"Finished generating edit paths for graphs {i} and {j} because the timeout was reached or no more edit paths are available.")
                     break
             global_edit_paths[(i, j)] = optimal_edit_paths
-    save_edit_path_to_file(db_name, global_edit_paths, file_path=output_dir)
+            save_edit_path_to_file(db_name, global_edit_paths, file_path=output_dir)
     return

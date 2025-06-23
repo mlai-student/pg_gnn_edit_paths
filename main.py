@@ -5,9 +5,7 @@ import os
 
 if __name__ == '__main__':
     # set the parameters for the generation of the edit paths
-    edit_path_generation_parameters = {'optimization_iterations': 100,
-                                       'max_num_edit_paths': 5,
-                                       'timeout': 10}
+    edit_path_generation_parameters = {'optimization_iterations': 100, 'timeout': 0.1}
 
 
     # create data folder if it does not exist
@@ -34,9 +32,7 @@ if __name__ == '__main__':
     generate_pairwise_edit_paths(graph_dataset,
                                  db_name=db_name,
                                  output_dir='data/',
-                                 optimization_iterations=edit_path_generation_parameters['optimization_iterations'],
-                                 max_num_edit_paths=edit_path_generation_parameters['max_num_edit_paths'],
-                                    timeout=edit_path_generation_parameters['timeout'])
+                                 optimization_iterations=edit_path_generation_parameters['optimization_iterations'],  timeout=edit_path_generation_parameters['timeout'])
     # get the graphs of the dataset
     nx_graphs = graph_dataset.nx_graphs
     # load the edit paths from the file
