@@ -5,7 +5,7 @@ import os
 
 if __name__ == '__main__':
     # set the parameters for the generation of the edit paths
-    edit_path_generation_parameters = {'optimization_iterations': 100, 'timeout': 0.1}
+    edit_path_generation_parameters = {'optimization_iterations': 100, 'timeout': 0.1, 'max_workers': None}
 
 
     # create data folder if it does not exist
@@ -28,11 +28,22 @@ if __name__ == '__main__':
     # print the maximum time
     print(f"Maximum runtime: {round(edit_path_generation_parameters['timeout'] * len(graph_dataset) * (len(graph_dataset) - 1) / 2 / (60 * 60), 2)} hours")
     print(f"Loaded MUTAG dataset with {len(graph_dataset)} graphs")
-    # generate the pairwise edit paths (not optimal) and save them to a file
-    generate_pairwise_edit_paths(graph_dataset,
-                                 db_name=db_name,
-                                 output_dir='data/',
-                                 optimization_iterations=edit_path_generation_parameters['optimization_iterations'],  timeout=edit_path_generation_parameters['timeout'])
+    # check wheter all edit paths already exist
+    edit_paths = load_edit_paths_from_file(db_name=db_name, file_path='data')
+    num_keys = 0
+    # get the number of keys in the edit paths dictionary
+    if edit_paths is not None:
+        num_keys = len(edit_paths.keys())
+    if num_keys == len(graph_dataset) * (len(graph_dataset) - 1) // 2:
+        print(f"All edit paths already exist in the file data/{db_name}_ged_paths.paths. Skipping generation.")
+    else:
+        # generate the pairwise edit paths (not optimal) and save them to a file
+        generate_pairwise_edit_paths(graph_dataset,
+                                     db_name=db_name,
+                                     output_dir='data/',
+                                     optimization_iterations=edit_path_generation_parameters['optimization_iterations'],
+                                     timeout=edit_path_generation_parameters['timeout'],
+                                     max_workers=edit_path_generation_parameters['max_workers'])
     # get the graphs of the dataset
     nx_graphs = graph_dataset.nx_graphs
     # load the edit paths from the file

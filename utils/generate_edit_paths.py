@@ -58,7 +58,8 @@ def process_graph_pair(params):
 def generate_pairwise_edit_paths(graph_dataset, db_name,
                                  output_dir:str = 'data/',
                                  optimization_iterations:int = 1,
-                                 timeout:int = 1000000):
+                                 timeout:int = 1000000,
+                                 max_workers:int = None):
     """
     Generates pairwise optimal paths for the given database.
 
@@ -67,6 +68,8 @@ def generate_pairwise_edit_paths(graph_dataset, db_name,
         db_name: Name of the database.
         output_dir: Directory where the edit paths will be saved.
         optimization_iterations: Number of optimization iterations to perform for each graph pair. TODO check if a value > 1 improves the length of the edit paths
+        timeout: Maximum time in seconds for the optimization process.
+        max_workers: Maximum number of worker processes to use. If None, uses the number of processors on the machine.
     """
 
     nx_graphs = graph_dataset.nx_graphs
@@ -88,7 +91,7 @@ def generate_pairwise_edit_paths(graph_dataset, db_name,
                                optimization_iterations, timeout))
 
     # Process graph pairs in parallel
-    with concurrent.futures.ProcessPoolExecutor() as executor:
+    with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
         # split the graph pairs into chunks for parallel processing
         chunk_size = 100
         graph_pair_chunks = [graph_pairs[i:i + chunk_size] for i in range(0, len(graph_pairs), chunk_size)]
