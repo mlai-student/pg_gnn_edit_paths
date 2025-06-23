@@ -1,0 +1,7 @@
+# PyTorch Geometric dependencies
+torch_geometric~=2.6.1
+# OGB dependencies for open graph benchmark datasets
+ogb~=1.3.6
+# Additional dependencies
+matplotlib~=3.10.3
+PyYAML~=6.0.2

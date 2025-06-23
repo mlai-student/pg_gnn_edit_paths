@@ -30,23 +30,20 @@ After installation, you can activate the environment using:
 - On Windows: `venv\Scripts\activate`
 - On macOS/Linux: `source venv/bin/activate`
 
-### Using pip with requirements.txt
+## Usage
 
-Alternatively, you can set up the environment manually using pip and the provided requirements.txt file:
+### main.py
+
+The `main.py` script demonstrates the core functionality of this repository:
+
+1. Loads the MUTAG dataset using the GraphDataset class
+2. Creates NetworkX graph representations of the dataset
+3. Generates pairwise edit paths between graphs and saves them to a file
+4. Loads the edit paths from the file
+5. Creates intermediate graphs for an edit path using a valid random permutation of operations
+
+To run the script:
 
 ```bash
-# Create a virtual environment
-python -m venv venv
-
-# Activate the virtual environment
-# On Windows:
-venv\Scripts\activate
-# On macOS/Linux:
-# source venv/bin/activate
-
-# Install dependencies from requirements.txt
-pip install -r requirements.txt
+python main.py
 ```
-
-This will install all the required dependencies including NumPy, Matplotlib, NetworkX, PyTorch CPU version, PyTorch Geometric (PyG), and the Open Graph Benchmark (OGB) package.
-

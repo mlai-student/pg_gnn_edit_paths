@@ -27,7 +27,7 @@ fi
 
 # Create virtual environment
 echo "Creating virtual environment..."
-python3.12 -m venv venv
+python -m venv venv
 
 # Activate virtual environment
 echo "Activating virtual environment..."
@@ -40,7 +40,10 @@ fi
 # Install required packages
 echo "Installing required packages..."
 # Install all dependencies from requirements.txt
+# install torch
+pip install torch~=2.7.1 --index-url https://download.pytorch.org/whl/cpu
 pip install -r requirements.txt
+
 
 echo "Installation complete! The virtual environment has been set up with all required dependencies."
 echo "To activate the environment in the future, run: $ACTIVATE_CMD"
