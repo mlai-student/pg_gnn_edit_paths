@@ -1,5 +1,7 @@
 from math import inf
 import concurrent.futures
+from typing import List, Tuple
+
 import networkx as nx
 from utils.plotting import plot_graph
 from utils.EditPath import EditPath
@@ -25,13 +27,7 @@ def process_graph_pair(params):
     Returns:
         A tuple of ((i, j), optimal_edit_paths) where optimal_edit_paths is a list of EditPath objects
     """
-    i, j, nx_graphs, db_name, loaded_edit_paths, optimization_iterations, timeout = params
-
-    # check whether the loaded edit paths already contain the pair (i, j)
-    if loaded_edit_paths is not None:
-        if (i, j) in loaded_edit_paths:
-            print(f"Edit path for graphs {i} and {j} already exist. Skipping generation.")
-            return ((i, j), loaded_edit_paths[(i, j)])
+    i, j, nx_graphs, db_name, optimization_iterations, timeout = params
 
     # set current distance to infinity
     current_edit_distance = float('inf')
@@ -57,6 +53,7 @@ def process_graph_pair(params):
 
 def generate_pairwise_edit_paths(graph_dataset, db_name,
                                  output_dir:str = 'data/',
+                                 missing_keys:List[Tuple[int, int]] = None,
                                  optimization_iterations:int = 1,
                                  timeout:int = 1000000,
                                  max_workers:int = None):
@@ -85,15 +82,14 @@ def generate_pairwise_edit_paths(graph_dataset, db_name,
 
     # Prepare parameters for parallel processing
     graph_pairs = []
-    for i in range(len(nx_graphs)):
-        for j in range(i + 1, len(nx_graphs)):
-            graph_pairs.append((i, j, nx_graphs, db_name, loaded_edit_paths, 
+    for i, j in missing_keys:
+        graph_pairs.append((i, j, nx_graphs, db_name,
                                optimization_iterations, timeout))
 
     # Process graph pairs in parallel
     with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
         # split the graph pairs into chunks for parallel processing
-        chunk_size = 100
+        chunk_size = 1000
         graph_pair_chunks = [graph_pairs[i:i + chunk_size] for i in range(0, len(graph_pairs), chunk_size)]
         for pairs in graph_pair_chunks:
             results = executor.map(process_graph_pair, pairs)
@@ -103,5 +99,4 @@ def generate_pairwise_edit_paths(graph_dataset, db_name,
                 global_edit_paths[pair_key] = edit_paths
             # Save after each pair is processed
             save_edit_path_to_file(db_name, global_edit_paths, file_path=output_dir)
-
     return

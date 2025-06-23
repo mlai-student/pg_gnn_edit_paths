@@ -31,15 +31,19 @@ if __name__ == '__main__':
     # check wheter all edit paths already exist
     edit_paths = load_edit_paths_from_file(db_name=db_name, file_path='data')
     num_keys = 0
+    # missing keys are all combinations
+    missing_keys = [(i, j) for i in range(len(graph_dataset)) for j in range(i + 1, len(graph_dataset))]
     # get the number of keys in the edit paths dictionary
     if edit_paths is not None:
         num_keys = len(edit_paths.keys())
+        missing_keys = [key for key in missing_keys if key not in edit_paths]
     if num_keys == len(graph_dataset) * (len(graph_dataset) - 1) // 2:
         print(f"All edit paths already exist in the file data/{db_name}_ged_paths.paths. Skipping generation.")
     else:
         # generate the pairwise edit paths (not optimal) and save them to a file
         generate_pairwise_edit_paths(graph_dataset,
                                      db_name=db_name,
+                                     missing_keys=missing_keys,
                                      output_dir='data/',
                                      optimization_iterations=edit_path_generation_parameters['optimization_iterations'],
                                      timeout=edit_path_generation_parameters['timeout'],
