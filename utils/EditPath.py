@@ -6,7 +6,7 @@ class EditPath:
     """
     This class stores and reformats the output of the edit path function of networkx.
     """
-    def __init__(self, db_name=None, start_id=None, end_id=None, start_graph:nx.Graph=None, end_graph:nx.Graph=None, edit_path=None):
+    def __init__(self, db_name=None, start_id=None, end_id=None, start_graph:nx.Graph=None, end_graph:nx.Graph=None, edit_path=None, iteration=None):
         """
         Initialize the EditPath object with the edit path information.
         :param db_name: Name of the database or dataset this edit path belongs to.
@@ -52,6 +52,7 @@ class EditPath:
             self.db_name = db_name
             self.start_id = start_id
             self.end_id = end_id
+            self.iteration = iteration
 
     # serialize the class to a json object
     def toJSON(self):
@@ -64,7 +65,8 @@ class EditPath:
             'edge_operations': self.edge_operations,
             'all_operations': self.all_operations,
             'node_map': self.node_map,
-            'inverse_node_map': self.inverse_node_map
+            'inverse_node_map': self.inverse_node_map,
+            'iteration': self.iteration
         }
     def loadJSON(self, json_obj):
         """
@@ -76,6 +78,7 @@ class EditPath:
         self.distance = json_obj['distance']
         self.node_operations = json_obj['node_operations']
         self.edge_operations = json_obj['edge_operations']
+        self.iteration = json_obj['iteration']
         if 'all_operations' in json_obj:
             self.all_operations = json_obj['all_operations']
         else:

@@ -5,7 +5,12 @@ import os
 
 if __name__ == '__main__':
     # set the parameters for the generation of the edit paths
-    edit_path_generation_parameters = {'optimization_iterations': 100, 'timeout': 1, 'max_workers': None}
+    edit_path_generation_parameters = {'optimization_iterations': 100, 'timeout': 10, 'max_workers': None}
+
+    # get max number of workers if max_workers is set to None
+    if edit_path_generation_parameters['max_workers'] is None:
+        import multiprocessing
+        edit_path_generation_parameters['max_workers'] = multiprocessing.cpu_count()
 
 
     # create data folder if it does not exist
@@ -26,7 +31,7 @@ if __name__ == '__main__':
     # print the number of graphs in the dataset
     print(f"Number of graphs in the {db_name} dataset: {len(graph_dataset)}")
     # print the maximum time
-    print(f"Maximum runtime: {round(edit_path_generation_parameters['timeout'] * len(graph_dataset) * (len(graph_dataset) - 1) / 2 / (60 * 60), 2)} hours")
+    print(f"Maximum runtime: {round(edit_path_generation_parameters['timeout'] * len(graph_dataset) * (len(graph_dataset) - 1) / 2 / (60 * 60), 2) / edit_path_generation_parameters['max_workers']} hours")
     print(f"Loaded MUTAG dataset with {len(graph_dataset)} graphs")
     # check wheter all edit paths already exist
     edit_paths = load_edit_paths_from_file(db_name=db_name, file_path='data')

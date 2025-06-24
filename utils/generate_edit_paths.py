@@ -41,7 +41,7 @@ def process_graph_pair(params):
             x = next(result_nx)
             edit_distance_x = x[2]
             if edit_distance_x < current_edit_distance:
-                optimal_edit_paths = [EditPath(db_name, i, j, start_graph=nx_graphs[i], end_graph=nx_graphs[j], edit_path=x)]
+                optimal_edit_paths = [EditPath(db_name, i, j, start_graph=nx_graphs[i], end_graph=nx_graphs[j], edit_path=x, iteration=p+1)]
                 current_edit_distance = edit_distance_x
             print(f"Generated edit path {p+1} / {optimization_iterations} for graphs {i} and {j}")
             p += 1
