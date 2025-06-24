@@ -8,26 +8,44 @@ echo "Setting up Python environment for GNN Edit Paths..."
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
     echo "Detected Windows operating system"
     ACTIVATE_CMD="venv\\Scripts\\activate"
-    # Check if Python 3.12 is installed
-    if ! command -v python3.12 &> /dev/null; then
-        echo "Python 3.12 could not be found. Please install Python 3.12 and try again."
+    # Check for Python 3.12, 3.11, or 3.10
+    if command -v python3.12 &> /dev/null; then
+        PYTHON_CMD="python3.12"
+        echo "Using Python 3.12"
+    elif command -v python3.11 &> /dev/null; then
+        PYTHON_CMD="python3.11"
+        echo "Python 3.12 not found. Using Python 3.11 instead."
+    elif command -v python3.10 &> /dev/null; then
+        PYTHON_CMD="python3.10"
+        echo "Python 3.12 and 3.11 not found. Using Python 3.10 instead."
+    else
+        echo "Python 3.12, 3.11, or 3.10 could not be found. Please install one of these Python versions and try again."
         exit 1
     fi
 else
     echo "Detected Unix-like operating system (Linux/macOS)"
     ACTIVATE_CMD="source venv/bin/activate"
-    # Check if Python 3.12 is installed
-    if ! command -v python3.12 &> /dev/null; then
-        echo "Python 3.12 could not be found. Please install Python 3.12 and try again."
+    # Check for Python 3.12, 3.11, or 3.10
+    if command -v python3.12 &> /dev/null; then
+        PYTHON_CMD="python3.12"
+        echo "Using Python 3.12"
+    elif command -v python3.11 &> /dev/null; then
+        PYTHON_CMD="python3.11"
+        echo "Python 3.12 not found. Using Python 3.11 instead."
+    elif command -v python3.10 &> /dev/null; then
+        PYTHON_CMD="python3.10"
+        echo "Python 3.12 and 3.11 not found. Using Python 3.10 instead."
+    else
+        echo "Python 3.12, 3.11, or 3.10 could not be found. Please install one of these Python versions and try again."
         exit 1
     fi
-    # Use python3.12 command on Unix-like systems
-    alias python=python3.12
+    # Use the detected Python version on Unix-like systems
+    alias python=$PYTHON_CMD
 fi
 
 # Create virtual environment
 echo "Creating virtual environment..."
-python -m venv venv
+$PYTHON_CMD -m venv venv
 
 # Activate virtual environment
 echo "Activating virtual environment..."
