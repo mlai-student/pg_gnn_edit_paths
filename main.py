@@ -5,7 +5,7 @@ import os
 
 if __name__ == '__main__':
     # set the parameters for the generation of the edit paths
-    edit_path_generation_parameters = {'optimization_iterations': 100, 'timeout': 10, 'max_workers': None}
+    edit_path_generation_parameters = {'optimization_iterations': 100, 'timeout': 60, 'max_workers': None}
 
     # get max number of workers if max_workers is set to None
     if edit_path_generation_parameters['max_workers'] is None:
