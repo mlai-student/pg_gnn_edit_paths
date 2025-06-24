@@ -77,9 +77,6 @@ def generate_pairwise_edit_paths(graph_dataset, db_name,
     # plot the second graph
     plot_graph(nx_graphs[1], with_node_ids=True)
 
-    # Load existing edit paths
-    loaded_edit_paths = load_edit_paths_from_file(db_name=db_name, file_path='data')
-
     # Prepare parameters for parallel processing
     graph_pairs = []
     for i, j in missing_keys:
@@ -87,13 +84,16 @@ def generate_pairwise_edit_paths(graph_dataset, db_name,
                                optimization_iterations, timeout))
 
     # Process graph pairs in parallel
-    with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
+    with (concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor):
         # split the graph pairs into chunks for parallel processing
-        chunk_size = 1000
+        chunk_size = 100
         graph_pair_chunks = [graph_pairs[i:i + chunk_size] for i in range(0, len(graph_pairs), chunk_size)]
         for pairs in graph_pair_chunks:
+            # Load existing edit paths
             results = executor.map(process_graph_pair, pairs)
-            global_edit_paths = load_edit_paths_from_file(db_name=db_name, file_path=output_dir) if loaded_edit_paths is not None else dict()
+            global_edit_paths = load_edit_paths_from_file(db_name=db_name, file_path=output_dir)
+            if global_edit_paths is None:
+                global_edit_paths = dict()
             # Collect results
             for (pair_key, edit_paths) in results:
                 global_edit_paths[pair_key] = edit_paths
