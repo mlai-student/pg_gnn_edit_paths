@@ -61,12 +61,12 @@ class EditPath:
             'start_id': self.start_id,
             'end_id': self.end_id,
             'distance': self.distance,
+            'iteration': self.iteration,
             'node_operations': self.node_operations,
             'edge_operations': self.edge_operations,
             'all_operations': self.all_operations,
             'node_map': self.node_map,
             'inverse_node_map': self.inverse_node_map,
-            'iteration': self.iteration
         }
     def loadJSON(self, json_obj):
         """
