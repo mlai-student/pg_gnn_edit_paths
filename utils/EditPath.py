@@ -176,7 +176,7 @@ class EditPath:
                 raise ValueError(f"Unknown operation type: {op_type}")
         return unsuccessful_operations
 
-    def create_edit_path_graphs(self, nx_graph1, nx_graph2, seed=42, plotting=True):
+    def create_edit_path_graphs(self, nx_graph1, nx_graph2, seed=42, plotting=False):
         """
         Create a sequence of networkx graphs representing the edit path. Starting from nx_graph1, applying the node and edge operations
         and ending with nx_graph2.

@@ -3,7 +3,7 @@ from utils.io import load_edit_paths_from_file
 import argparse
 
 
-def load_edit_path_between_graphs(graph_dataset: GraphDataset, db_name: str, data_dir: str, start_graph_id: int, end_graph_id: int):
+def get_edit_path_between_graphs(graph_dataset: GraphDataset, db_name: str, data_dir: str, start_graph_id: int, end_graph_id: int, plotting=False, seed=42):
     """
     Load edit path between two graphs and create edit path graphs.
 
@@ -25,12 +25,9 @@ def load_edit_path_between_graphs(graph_dataset: GraphDataset, db_name: str, dat
     edit_paths = load_edit_paths_from_file(db_name=db_name, file_path=data_dir)
     # example of creating edit path graphs using some valid random permutation of the operations
     # take the edit path with index 0 between the graphs with the given ids
-    edit_path_graphs = edit_paths[(start_graph_id, end_graph_id)][0].create_edit_path_graphs(nx_graphs[start_graph_id], nx_graphs[end_graph_id], seed=42)
+    return edit_paths[(start_graph_id, end_graph_id)][0].create_edit_path_graphs(nx_graphs[start_graph_id], nx_graphs[end_graph_id], plotting=plotting, seed=seed)
 
-    return edit_path_graphs
-
-
-def main(db_name='MUTAG', data_dir='data', start_graph_id=0, end_graph_id=1):
+def main(db_name='MUTAG', data_dir='data', start_graph_id=0, end_graph_id=1, seed=42):
     """
     Main function to load edit paths between graphs and create edit path graphs.
 
@@ -39,6 +36,7 @@ def main(db_name='MUTAG', data_dir='data', start_graph_id=0, end_graph_id=1):
         data_dir (str): Directory where the edit paths are stored
         start_graph_id (int): ID of the start graph
         end_graph_id (int): ID of the end graph
+        seed (int): Seed for reproducibility in plotting
 
     Returns:
         list: List of edit path graphs
@@ -54,15 +52,17 @@ def main(db_name='MUTAG', data_dir='data', start_graph_id=0, end_graph_id=1):
     graph_dataset.create_nx_graphs()
 
     # Load edit path between graphs
-    edit_path_graphs = load_edit_path_between_graphs(
+    path_graphs = get_edit_path_between_graphs(
         graph_dataset, 
         db_name, 
         data_dir, 
         start_graph_id=start_graph_id, 
-        end_graph_id=end_graph_id
+        end_graph_id=end_graph_id,
+        plotting=True,  # Set to True if you want to plot the edit path graphs
+        seed=seed  # Set a seed for reproducibility in plotting
     )
 
-    return edit_path_graphs
+    return path_graphs
 
 
 if __name__ == '__main__':
@@ -76,16 +76,19 @@ if __name__ == '__main__':
                         help='ID of the start graph (default: 0)')
     parser.add_argument('--end_graph_id', type=int, default=1,
                         help='ID of the end graph (default: 1)')
+    parser.add_argument('--seed', type=int, default=42,
+                        help='Seed for reproducibility (default: 42)')
 
     # Parse arguments
     args = parser.parse_args()
 
     # Call main function with parsed arguments
-    edit_path_graphs = main(
+    path_graphs = main(
         db_name=args.db_name,
         data_dir=args.data_dir,
         start_graph_id=args.start_graph_id,
-        end_graph_id=args.end_graph_id
+        end_graph_id=args.end_graph_id,
+        seed=args.seed
     )
 
     print(f"Successfully loaded edit path graphs between graph {args.start_graph_id} and {args.end_graph_id} from {args.db_name} dataset.")
