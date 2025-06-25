@@ -63,7 +63,8 @@ def process_graph_pair(params):
 def generate_pairwise_edit_paths(graph_dataset, db_name,
                                  output_dir:str = 'data/',
                                  missing_keys:List[Tuple[int, int]] = None,
-                                 parameters:dict = None):
+                                 parameters:dict = None,
+                                 plotting:bool = False):
     """
     Generates pairwise optimal paths for the given database.
 
@@ -86,9 +87,10 @@ def generate_pairwise_edit_paths(graph_dataset, db_name,
     if nx_graphs is None:
         raise ValueError("No NetworkX graphs found in the GraphDataset. Please create them first using graph_dataset.create_nx_graphs()")
     # plot the first graph
-    plot_graph(nx_graphs[0], with_node_ids=True)
-    # plot the second graph
-    plot_graph(nx_graphs[1], with_node_ids=True)
+    if plotting:
+        plot_graph(nx_graphs[0], with_node_ids=True)
+        # plot the second graph
+        plot_graph(nx_graphs[1], with_node_ids=True)
 
     # Prepare parameters for parallel processing
     graph_pairs = []

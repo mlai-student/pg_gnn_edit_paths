@@ -5,7 +5,7 @@ import os
 import argparse
 import multiprocessing
 
-def main(db_name='MUTAG', optimization_iterations=100, timeout=60, max_workers=None, output_dir='data'):
+def main(db_name='MUTAG', optimization_iterations=100, timeout=60, max_workers=None, output_dir='data', plotting=False):
     """
     Main function to generate and process edit paths for graph datasets.
 
@@ -15,6 +15,7 @@ def main(db_name='MUTAG', optimization_iterations=100, timeout=60, max_workers=N
         timeout (int): Timeout in seconds for each graph pair processing
         max_workers (int): Maximum number of worker processes, None for auto-detection
         output_dir (str): Directory to store output files
+        plotting (bool): Whether to plot the graphs during processing
     """
     # set the parameters for the generation of the edit paths
     edit_path_generation_parameters = {
@@ -63,7 +64,8 @@ def main(db_name='MUTAG', optimization_iterations=100, timeout=60, max_workers=N
                                      db_name=db_name,
                                      output_dir=f"{output_dir}/",
                                      missing_keys=missing_keys,
-                                     parameters=edit_path_generation_parameters)
+                                     parameters=edit_path_generation_parameters,
+                                     plotting=plotting)
 
 if __name__ == '__main__':
     # Set up argument parsing
@@ -78,6 +80,8 @@ if __name__ == '__main__':
                         help='Maximum number of worker processes (default: None for auto-detection)')
     parser.add_argument('--output_dir', type=str, default='data',
                         help='Directory to store output files (default: data)')
+    parser.add_argument('--plotting', action='store_true',
+                        help='Whether to plot the graphs during processing (default: False)')
 
     # Parse arguments
     args = parser.parse_args()
@@ -88,5 +92,6 @@ if __name__ == '__main__':
         optimization_iterations=args.optimization_iterations,
         timeout=args.timeout,
         max_workers=args.max_workers,
-        output_dir=args.output_dir
+        output_dir=args.output_dir,
+        plotting=args.plotting
     )
