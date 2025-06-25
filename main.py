@@ -48,11 +48,9 @@ if __name__ == '__main__':
         # generate the pairwise edit paths (not optimal) and save them to a file
         generate_pairwise_edit_paths(graph_dataset,
                                      db_name=db_name,
-                                     missing_keys=missing_keys,
                                      output_dir='data/',
-                                     optimization_iterations=edit_path_generation_parameters['optimization_iterations'],
-                                     timeout=edit_path_generation_parameters['timeout'],
-                                     max_workers=edit_path_generation_parameters['max_workers'])
+                                     missing_keys=missing_keys,
+                                     paremeters=edit_path_generation_parameters)
     # get the graphs of the dataset
     nx_graphs = graph_dataset.nx_graphs
     # load the edit paths from the file

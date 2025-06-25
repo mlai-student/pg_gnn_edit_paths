@@ -41,7 +41,7 @@ def process_graph_pair(params):
             x = next(result_nx)
             edit_distance_x = x[2]
             if edit_distance_x < current_edit_distance:
-                optimal_edit_paths = [EditPath(db_name, i, j, start_graph=nx_graphs[i], end_graph=nx_graphs[j], edit_path=x, iteration=p+1)]
+                optimal_edit_paths = [EditPath(db_name, i, j, start_graph=nx_graphs[i], end_graph=nx_graphs[j], edit_path=x, iteration=p+1, max_iterations=optimization_iterations, timeout=timeout)]
                 current_edit_distance = edit_distance_x
             print(f"Generated edit path {p+1} / {optimization_iterations} for graphs {i} and {j}")
             p += 1
@@ -54,19 +54,19 @@ def process_graph_pair(params):
 def generate_pairwise_edit_paths(graph_dataset, db_name,
                                  output_dir:str = 'data/',
                                  missing_keys:List[Tuple[int, int]] = None,
-                                 optimization_iterations:int = 1,
-                                 timeout:int = 1000000,
-                                 max_workers:int = None):
+                                 parameters:dict = None):
     """
     Generates pairwise optimal paths for the given database.
 
     Args:
-        graph_dataset: GNNDataset object containing the dataset.
-        db_name: Name of the database.
-        output_dir: Directory where the edit paths will be saved.
-        optimization_iterations: Number of optimization iterations to perform for each graph pair. TODO check if a value > 1 improves the length of the edit paths
-        timeout: Maximum time in seconds for the optimization process.
-        max_workers: Maximum number of worker processes to use. If None, uses the number of processors on the machine.
+        :param graph_dataset: GNNDataset object containing the dataset.
+        :param db_name: Name of the database.
+        :param output_dir: Directory where the edit paths will be saved.
+        :param missing_keys: List of tuples containing the indices of the graph pairs for which edit paths should be generated.
+        :param parameters: Dictionary containing the parameters for the edit path generation, i.e.,
+            - optimization_iterations: Number of optimization iterations to perform for each graph pair. TODO check if a value > 1 improves the length of the edit paths
+            - timeout: Maximum time in seconds for the optimization process.
+            - max_workers: Maximum number of worker processes to use. If None, uses the number of processors on the machine.
     """
 
     nx_graphs = graph_dataset.nx_graphs
@@ -81,10 +81,10 @@ def generate_pairwise_edit_paths(graph_dataset, db_name,
     graph_pairs = []
     for i, j in missing_keys:
         graph_pairs.append((i, j, nx_graphs, db_name,
-                               optimization_iterations, timeout))
+                               parameters["optimization_iterations"], parameters["timeout"]))
 
     # Process graph pairs in parallel
-    with (concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor):
+    with (concurrent.futures.ProcessPoolExecutor(max_workers=parameters["max_workers"]) as executor):
         # split the graph pairs into chunks for parallel processing
         chunk_size = 100
         graph_pair_chunks = [graph_pairs[i:i + chunk_size] for i in range(0, len(graph_pairs), chunk_size)]

@@ -6,7 +6,7 @@ class EditPath:
     """
     This class stores and reformats the output of the edit path function of networkx.
     """
-    def __init__(self, db_name=None, start_id=None, end_id=None, start_graph:nx.Graph=None, end_graph:nx.Graph=None, edit_path=None, iteration=None):
+    def __init__(self, db_name=None, start_id=None, end_id=None, start_graph:nx.Graph=None, end_graph:nx.Graph=None, edit_path=None, iteration=None, max_iterations=None, timeout=None):
         """
         Initialize the EditPath object with the edit path information.
         :param db_name: Name of the database or dataset this edit path belongs to.
@@ -17,6 +17,9 @@ class EditPath:
         :param edit_path: Output of the function nx.optimize_edit_paths, which is a tuple containing:
             - A list of node operations, where each operation is a tuple (node1, node2) indicating the operation between two nodes.
             - A list of edge operations, where each operation is a tuple (edge1, edge2) indicating the operation between two edges.
+        :param iteration: The current iteration of the edit path generation, useful for tracking progress.
+        :param max_iterations: The maximum number of iterations to generate the edit path.
+        :param timeout: The maximum time in seconds to generate the edit path.
         """
 
         if edit_path is not None:
@@ -53,6 +56,8 @@ class EditPath:
             self.start_id = start_id
             self.end_id = end_id
             self.iteration = iteration
+            self.max_iterations = max_iterations
+            self.timeout = timeout
 
     # serialize the class to a json object
     def toJSON(self):
@@ -62,6 +67,8 @@ class EditPath:
             'end_id': self.end_id,
             'distance': self.distance,
             'iteration': self.iteration,
+            'max_iterations': self.max_iterations,
+            'timeout': self.timeout,
             'node_operations': self.node_operations,
             'edge_operations': self.edge_operations,
             'all_operations': self.all_operations,
@@ -79,6 +86,10 @@ class EditPath:
         self.node_operations = json_obj['node_operations']
         self.edge_operations = json_obj['edge_operations']
         self.iteration = json_obj['iteration']
+        if 'max_iterations' in json_obj:
+            self.max_iterations = json_obj['max_iterations']
+        if 'timeout' in json_obj:
+            self.timeout = json_obj['timeout']
         if 'all_operations' in json_obj:
             self.all_operations = json_obj['all_operations']
         else:
