@@ -86,6 +86,8 @@ class EditPath:
         self.node_operations = json_obj['node_operations']
         self.edge_operations = json_obj['edge_operations']
         self.iteration = json_obj['iteration']
+        self.max_iterations = 0
+        self.timeout = 0
         if 'max_iterations' in json_obj:
             self.max_iterations = json_obj['max_iterations']
         if 'timeout' in json_obj:

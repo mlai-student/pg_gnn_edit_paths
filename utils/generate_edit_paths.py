@@ -27,13 +27,13 @@ def process_graph_pair(params):
     Returns:
         A tuple of ((i, j), optimal_edit_paths) where optimal_edit_paths is a list of EditPath objects
     """
-    i, j, nx_graphs, db_name, optimization_iterations, timeout = params
+    i, j, graph_i, graph_j, db_name, optimization_iterations, timeout = params
 
     # set current distance to infinity
     current_edit_distance = float('inf')
     print(f"Comparing graph {i} with graph {j}")
     # Use the global node_match_primary and edge_match_primary functions
-    result_nx = nx.optimize_edit_paths(nx_graphs[i], nx_graphs[j], node_match=node_match_primary, edge_match=edge_match_primary, timeout=timeout)
+    result_nx = nx.optimize_edit_paths(graph_i, graph_j, node_match=node_match_primary, edge_match=edge_match_primary, timeout=timeout)
     optimal_edit_paths = []
     p = 0
     while p < optimization_iterations:
@@ -41,7 +41,7 @@ def process_graph_pair(params):
             x = next(result_nx)
             edit_distance_x = x[2]
             if edit_distance_x < current_edit_distance:
-                optimal_edit_paths = [EditPath(db_name, i, j, start_graph=nx_graphs[i], end_graph=nx_graphs[j], edit_path=x, iteration=p+1, max_iterations=optimization_iterations, timeout=timeout)]
+                optimal_edit_paths = [EditPath(db_name, i, j, start_graph=graph_i, end_graph=graph_j, edit_path=x, iteration=p+1, max_iterations=optimization_iterations, timeout=timeout)]
                 current_edit_distance = edit_distance_x
             print(f"Generated edit path {p+1} / {optimization_iterations} for graphs {i} and {j}")
             p += 1
@@ -80,7 +80,7 @@ def generate_pairwise_edit_paths(graph_dataset, db_name,
     # Prepare parameters for parallel processing
     graph_pairs = []
     for i, j in missing_keys:
-        graph_pairs.append((i, j, nx_graphs, db_name,
+        graph_pairs.append((i, j, nx_graphs[i], nx_graphs[j], db_name,
                                parameters["optimization_iterations"], parameters["timeout"]))
 
     # Process graph pairs in parallel
