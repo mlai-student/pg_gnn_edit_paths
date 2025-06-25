@@ -50,7 +50,7 @@ if __name__ == '__main__':
                                      db_name=db_name,
                                      output_dir='data/',
                                      missing_keys=missing_keys,
-                                     paremeters=edit_path_generation_parameters)
+                                     parameters=edit_path_generation_parameters)
     # get the graphs of the dataset
     nx_graphs = graph_dataset.nx_graphs
     # load the edit paths from the file
