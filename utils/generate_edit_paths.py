@@ -27,13 +27,22 @@ def process_graph_pair(params):
     Returns:
         A tuple of ((i, j), optimal_edit_paths) where optimal_edit_paths is a list of EditPath objects
     """
-    i, j, graph_i, graph_j, db_name, optimization_iterations, timeout = params
+    i, j, graph_i, graph_j, db_name, optimization_iterations, timeout, use_node_match, use_edge_match = params
 
     # set current distance to infinity
     current_edit_distance = float('inf')
     print(f"Comparing graph {i} with graph {j}")
     # Use the global node_match_primary and edge_match_primary functions
-    result_nx = nx.optimize_edit_paths(graph_i, graph_j, node_match=node_match_primary, edge_match=edge_match_primary, timeout=timeout)
+    # use node_match edge_match only if the graphs have primary labels resp labels
+    if use_node_match:
+        node_match = node_match_primary
+    else:
+        node_match = None
+    if use_edge_match:
+        edge_match = edge_match_primary
+    else:
+        edge_match = None
+    result_nx = nx.optimize_edit_paths(graph_i, graph_j, node_match=node_match, edge_match=edge_match, timeout=timeout)
     optimal_edit_paths = []
     p = 0
     while p < optimization_iterations:
@@ -70,6 +79,10 @@ def generate_pairwise_edit_paths(graph_dataset, db_name,
     """
 
     nx_graphs = graph_dataset.nx_graphs
+    use_node_match = True if graph_dataset.node_labels.get('primary', None) is not None else False
+    print('Node labels detected. Use them for matching')
+    use_edge_match = True if graph_dataset.edge_labels.get('primary', None) is not None else False
+    print('Edge labels detected. Use them for matching')
     if nx_graphs is None:
         raise ValueError("No NetworkX graphs found in the GraphDataset. Please create them first using graph_dataset.create_nx_graphs()")
     # plot the first graph
@@ -81,7 +94,7 @@ def generate_pairwise_edit_paths(graph_dataset, db_name,
     graph_pairs = []
     for i, j in missing_keys:
         graph_pairs.append((i, j, nx_graphs[i], nx_graphs[j], db_name,
-                               parameters["optimization_iterations"], parameters["timeout"]))
+                               parameters["optimization_iterations"], parameters["timeout"], use_node_match, use_edge_match))
 
     # Process graph pairs in parallel
     with (concurrent.futures.ProcessPoolExecutor(max_workers=parameters["max_workers"]) as executor):
